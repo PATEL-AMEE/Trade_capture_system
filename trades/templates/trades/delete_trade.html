@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Trade</title>
+</head>
+<body>
+    <h1>Delete Trade</h1>
+    <p>Are you sure you want to delete the trade with Security ID {{ trade.security_id }}?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirm</button>
+        <a href="#" data-dismiss="modal" class="btn btn-secondary">Cancel</a>
+    </form>
+</body>
+</html>

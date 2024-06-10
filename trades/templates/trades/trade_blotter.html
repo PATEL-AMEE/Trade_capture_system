@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Blotter</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'trades/style.css' %}">
+</head>
+<body>
+    <nav>
+        <a href="/" aria-current="page">Home</a>
+        <a href="{% url 'trades:add_trade' %}">Add Trade</a>
+    </nav>
+    <main>
+        <h1>Trade Blotter</h1>
+        <table>
+            <tr>
+                <th>Security ID</th>
+                <th>Instrument Type</th>
+                <th>Trade Date</th>
+                <th>Notional Amount</th>
+                <th>Number of Contracts</th>
+                <th>Price</th>
+                <th>User Name</th>
+                <th>Comment</th>
+                <th>Spread</th>
+                <th>Timestamp</th>
+                <th>Strategy</th>
+                <th>Edit / Delete</th>
+            </tr>
+            {% for trade in trades %}
+            <tr>
+                <td>{{ trade.security_id }}</td>
+                <td>{{ trade.instrument_type }}</td>
+                <td>{{ trade.trade_date }}</td>
+                <td>{{ trade.notional }}</td>
+                <td>{{ trade.no_of_contracts }}</td>
+                <td>{{ trade.price }}</td>
+                <td>{{ trade.user_name }}</td>
+                <td>{{ trade.comment }}</td>
+                <td>{{ trade.spread }}</td>
+                <td>{{ trade.timestamp }}</td>
+                <td>{{ trade.strategy }}</td>
+                <td>
+                    <a href="{% url 'trades:edit_trade' trade.trade_id %}">Edit</a>
+                    <a href="{% url 'trades:delete_trade' trade.trade_id %}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </main>
+</body>
+</html>

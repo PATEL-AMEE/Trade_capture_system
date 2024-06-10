@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRADE CAPTURE SYSTEM</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'trades/style.css' %}">
+    <link rel="stylesheet" href="{% static 'trades/trade.css' %}">
+</head>
+
+<body>
+    <nav>
+        <a href="/" aria-current="page">Home</a>
+    </nav>
+    <main>
+        <h1>Trade Viewer</h1>
+
+        <hr />
+        <!-- <div>  -->
+        <div id="mainContainer">
+            <div>
+                <div>
+                    <div class="flex flex-row gap-10">
+                        <div class="grid-col-6 box-shadow">
+                            <div class="flex p-15">
+                                <form method="post" action="{% url 'trades:add_trade' %}">
+                                    {% csrf_token %}
+                                    {{ form.as_p }}
+                                    
+                                    <button type="submit">Submit</button>
+                                </form>
+                                <div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid-col-6 box-shadow p-25">
+                            <div class="p-15">
+                                <h4>Trade Chart</h4>
+                                <canvas id="tradeChart" width="800" height="400"></canvas>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid-col-10 mt-10 box-shadow p-15">
+                        <h4>Trade Table</h4>
+                        <div class="flex">
+                            <table id="trade-table">
+                                <thead>
+                                    <tr>
+                                        <th>Security ID</th>
+                                        <th>Instrument Type</th>
+                                        <th>Trade Date</th>
+                                        <th>Notional Amount</th>
+                                        <th>Number of Contracts</th>
+                                        <th>Price</th>
+                                        <th>User Name</th>
+                                        <th>Comment</th>
+                                        <th>Spread</th>
+                                        <th>Timestamp</th>
+                                        <th>Strategy</th>
+                                        <th>Direction</th>
+                                        <th>Edit / Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for trade in trades %}
+                                    <tr>
+                                        <td>{{ trade.security_id }}</td>
+                                        <td>{{ trade.instrument_type }}</td>
+                                        <td>{{ trade.trade_date}}</td>
+                                        <td>{{ trade.notional }}</td>
+                                        <td>{{ trade.no_of_contracts }}</td>
+                                        <td>{{ trade.price }}</td>
+                                        <td>{{ trade.user_name }}</td>
+                                        <td>{{ trade.comment }}</td>
+                                        <td>{{ trade.spread }}</td>
+                                        <td>{{ trade.timestamp }}</td>
+                                        <td>{{ trade.strategy }}</td>
+                                        <td>{{ trade.direction}}</td>
+                                        <td>
+                                            <!-- <a data-toggle="modal" data-target="#myModal"
+                                                class="btn btn-primary editTradeBtn"
+                                                data-tradeid="{{ trade.trade_id }}">Edit</a> -->
+                                            <a href="{% url 'trades:edit_trade' trade.trade_id %}" class="btn btn-primary editTradeBtn">Edit</a>
+
+                                            <!-- <a href="{% url 'trades:delete_trade' trade.trade_id %}">Delete</a> -->
+
+                                            <a href="#" data-toggle="modal" data-target="#deleteModal"
+                                                class="btn btn-danger deleteTradeBtn"
+                                                data-tradeid="{{ trade.trade_id }}">Delete</a>
+                                        </td>
+
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                            </table>
+                            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+                                aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog p-15" role="document">
+                                    <div class="modal-content p-15">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel">Delete Trade</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete this trade?</p>
+                                            <form id="deleteTradeForm" method="post" action="">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">Confirm</button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Cancel</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+                                aria-labelledby="editModalLabel" aria-hidden="true">
+                                <div class="modal-dialog p-15" role="document">
+                                    <div class="modal-content p-15">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editModalLabel">Edit Trade</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="editTradeForm" method="post">
+                                                {% csrf_token %}
+                                                {{ form.as_p }}
+                                                <button type="submit">Submit</button>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Close</button>
+
+                                            <button type="submit" class="btn btn-primary">Save
+                                                changes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                        <button id="update-button">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="usernameFormWrapper">
+            <h2>Please enter your username</h2>
+            <form id="usernameForm" method="post">
+                {% csrf_token %}
+                <input type="text" id="usernameInput" name="username" placeholder="Enter your username">
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{% static 'trades/trade.js' %}"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+
+</html>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+
+
+    $(document).ready(function () {
+        $('#instrument_type input[type="radio"]').change(function () {
+            var selectedType = $(this).val();
+            updateFormFields(selectedType);
+        });
+
+        function updateFormFields(instrumentType) {
+            // Hide all specific fields
+            $('#price').closest('p').hide();
+            $('#spread').closest('p').hide();
+            $('#notional').closest('p').hide();
+            $('#no_of_contracts').closest('p').hide();
+            $('#direction').closest('p').hide();
+            $('#strategy').empty(); // Clear existing options
+
+            // Show common fields
+            $('#security_id').closest('p').show();
+            $('#trade_date').closest('p').show();
+            // $('#user_name').closest('p').show();
+            $('#comment').closest('p').show();
+            $('#strategy').closest('p').show();
+
+            // Show fields based on instrument type
+            if (instrumentType === 'bonds') {
+                $('#price').closest('p').show();
+                $('#spread').closest('p').show();
+                $('#notional').closest('p').show();
+                $('#direction').closest('p').show();
+                addStrategyOptions(['Active Short', 'RelVal', 'SLBs', 'Curves', 'Use of proceeds']);
+            } else if (instrumentType === 'cds') {
+                $('#spread').closest('p').show();
+                $('#notional').closest('p').show();
+                $('#direction').closest('p').show();
+                $('#price').closest('p').show();
+                addStrategyOptions(['Active Short', 'RelVal', 'SLBs', 'Curves', 'Use of proceeds']);
+            } else if (instrumentType === 'futures') {
+                $('#price').closest('p').show();
+                $('#no_of_contracts').closest('p').show();
+                $('#direction').closest('p').show();
+                addStrategyOptions(['Hedge']);
+            } else if (instrumentType === 'fx') {
+                $('#price').closest('p').show();
+                $('#notional').closest('p').show();
+                $('#direction').closest('p').show();
+                addStrategyOptions(['Hedge']);
+            }
+        }
+
+        function addStrategyOptions(strategies) {
+            var select = $('#strategy');
+            strategies.forEach(function (strategy) {
+                select.append($('<option>').text(strategy).attr('value', strategy));
+            });
+        }
+
+        
+        $('.deleteTradeBtn').on('click', function (e) {
+            e.preventDefault();
+            var tradeId = $(this).data('tradeid');
+            $('#deleteTradeForm').attr('action', '/trades/delete/' + tradeId + '/');
+        });
+
+        document.getElementById('usernameForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            var username = document.getElementById('usernameInput').value;
+            localStorage.setItem('username', username);
+
+            document.getElementById('usernameFormWrapper').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            document.getElementById('usernameSpan').textContent = username;
+        });
+        var username = localStorage.getItem('username');
+        if (username) {
+            document.getElementById('usernameFormWrapper').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            document.getElementById('usernameSpan').textContent = username;
+        }
+
+
+        $('.editTradeBtn').on('click', function (e) {
+            e.preventDefault();
+
+            var tradeId = $(this).data('tradeid');
+            $.ajax({
+                url: '/trades/edit/' + tradeId + '/',
+                type: 'GET',
+                success: function (response) {
+
+                    $('#myModal .modal-content').html(response);
+
+                    $('#myModal').show();
+                },
+                error: function (error) {
+                    console.error('Error fetching trade data:', error);
+                }
+            });
+        });
+
+        $('#update-button').click(function () {
+            var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+            $.ajax({
+                url: '{% url "trades:update_trades" %}',
+                type: 'POST',
+                headers: { 'X-CSRFToken': csrftoken },
+                success: function (data) {
+                    alert('Data updated successfully!');
+                    $('#trade-table tbody').empty(); 
+                },
+                error: function (xhr, status, error) {
+                    alert('An error occurred while updating data: ' + error);
+                }
+            });
+        });
+    });
+
+    $.ajax({
+        url: '{% url "trades:update_trades" %}',
+        type: 'POST',
+        headers: { 'X-CSRFToken': csrftoken },
+        data: {}, 
+        success: function (data) {
+            alert('Data updated successfully!');
+            $('#trade-table tbody').empty(); 
+        },
+        error: function (xhr, status, error) {
+            alert('An error occurred while updating data: ' + error);
+        }
+    });
+</script>
+
+
+<script>
+    function decodeAndReplaceQuotes(text) {
+        var textarea = document.createElement('textarea');
+        textarea.innerHTML = text;
+        var decodedString = textarea.value;
+        return decodedString.replace(/'/g, '"');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var tradeTypes = decodeAndReplaceQuotes('{{trade_types}}');
+        const tradeTypeCounts = JSON.parse(tradeTypes).reduce((acc, obj) => {
+            const type = obj.instrument_type;
+
+            if (acc[type]) {
+                acc[type]++;
+            } else {
+                acc[type] = 1;
+            }
+            return acc;
+        }, {});
+
+        var labelsMap = {
+            "futures": "Futures",
+            "fx": "FX",
+            "bonds": "Bonds",
+            'cds': 'CDS'
+        };
+
+        var labels = Object.keys(tradeTypeCounts).map(key => labelsMap[key]);
+        var values = Object.values(tradeTypeCounts);
+        const ctx = document.getElementById('tradeChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Trades by Instrument Type',
+                    data: values,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    });
+</script>

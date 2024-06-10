@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Trade</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'trades/style.css' %}">
+    <script src="{% static 'trades/trade.js' %}" defer></script>
+</head>
+<body>
+    <nav>
+        <a href="/" aria-current="page">Home</a>
+    </nav>
+    <main>
+        <h1>Add Trade</h1>
+        <form method="post" action="{% url 'trades:add_trade' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Submit</button>
+        </form>
+        
+    </main>
+</body>
+</html>
